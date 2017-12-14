@@ -80,7 +80,6 @@
             word-wrap: break-word;
             margin-top: 10px;
             padding: 5px 5px 5px 5px;
-
         }
 
         #content-wrap #chatbox-section #messages-section div.me {
@@ -115,8 +114,8 @@
             height: 100%;
         }
 
-        .active { 
-            background: #17a2b8;
+        .active {
+            background: #f8f9fa !important;
         }
 
         .aquamarine {
@@ -138,7 +137,9 @@
 <body>
 
     <nav class="navbar navbar-expand-lg navbar-light bg-light aquamarine">
-        <a class="navbar-brand" href="#">VideoChat</a>
+        <a class="navbar-brand" href="#">VideoChat
+            <span id="pid"></span>
+        </a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
             aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -164,19 +165,16 @@
 
     <div class="container-fluid">
         <div class="row" id="content-wrap">
+
+
             <div class="col col-sm-12 col-md-12 col-lg-3" id="user-section"></div>
 
-            <div class="col col-lg-6 bg-light d-sm-none d-md-block d-none d-sm-block" id="chatbox-section">
+            <div class="col col-lg-6 bg-light d-none" id="chatbox-section">
                 <div class="row">
                     <div class="card border-light mb-3" id="chat-section">
                         <div class="card-header">
                             <div class="row">
-                                <div class="col col-sm-6">
-                                    <p>Anthony Medina
-                                        <br>
-                                        <small>Conectado actualmente</small>
-                                    </p>
-                                </div>
+                                <div class="col col-sm-6 text-header"></div>
                                 <div class="col col-sm-6 text-right">
                                     <button id="call" type="button" class="btn btn-primary btn-sm ">
                                         <span class="oi" data-glyph="phone"></span>
@@ -216,13 +214,13 @@
                 </div>
             </div>
 
-            <div class="col col-lg-3 d-sm-none d-md-block d-none d-sm-block" id="camera-section">
+            <div class="col col-lg-3 d-none" id="camera-section">
                 <div class="row">
 
-                    <div id="camera" class="d-block">
+                    <div id="camera" class="d-none">
                         <div class="card col col-sm-12">
                             <video id="peer-camera" width="100%" autoplay="autoplay" class="center-block"></video>
-                            <h6>Anthony Medina</h6>
+                            <h6 id="user-camera">Anthony Medina</h6>
                         </div>
                         <div class="card col col-sm-12">
                             <video id="my-camera" width="100%" autoplay="autoplay" muted="true" class="center-block"></video>
@@ -232,11 +230,10 @@
 
                     <div id="info" class="col col-sm-12 col-md-12 col-lg-12 text-center">
                         <br>
-                        <img width="150" height="150" class=" img-fluid rounded-circle border border-secondary" src="https://www.cryptocompare.com/media/19582/icon-user-default.png"
-                            alt="Card image cap">
+                        <img id="info-image" width="150" height="150" class=" img-fluid rounded-circle border border-secondary" src="" alt="Card image cap">
                         <div class="card-body">
-                            <h4 class="card-title">Anthony Medina</h4>
-                            <p class="card-text">Medico Cirujano</p>
+                            <h4 class="card-title" id="info-name"></h4>
+                            <p class="card-text" id="info-username"></p>
                         </div>
 
                     </div>
@@ -265,58 +262,68 @@
     <script src="resources/js/peer.min.js"></script>
 
     <script>
-
         var db = {
-            users: [
-                {
+            users: [{
                     id: 1,
-                    username : "anthony",
+                    username: "anthony",
                     nombre: "Anthony",
                     apellido: "Medina",
-                    imagen : "http://www.tuestima.com/wp-content/uploads/2015/11/Entrevista-Dr-Nicholas-Perricone.jpg"
+                    imagen: "http://www.tuestima.com/wp-content/uploads/2015/11/Entrevista-Dr-Nicholas-Perricone.jpg"
                 },
                 {
                     id: 2,
-                    username : "juan",
+                    username: "juan",
                     nombre: "Juan",
                     apellido: "Sanchez",
-                    imagen : "https://labs.openviewpartners.com/wp-content/uploads/2016/02/Mike-King-300x300.png"
+                    imagen: "https://labs.openviewpartners.com/wp-content/uploads/2016/02/Mike-King-300x300.png"
                 },
                 {
                     id: 3,
-                    username : "pedro",
+                    username: "pedro",
                     nombre: "Pedro",
                     apellido: "Perez",
-                    imagen : "http://www.hemorroidestratamientoycura.com/wp-content/uploads/2012/10/doctor.png"
+                    imagen: "http://www.hemorroidestratamientoycura.com/wp-content/uploads/2012/10/doctor.png"
                 }
             ],
-            conversations: [
-                {
+            connections: [{
                     id: 1,
-                    username : "anthony",
-                    nombre: "Anthony",
-                    apellido: "Medina",
-                    imagen : "http://www.tuestima.com/wp-content/uploads/2015/11/Entrevista-Dr-Nicholas-Perricone.jpg"
+                    peers: ["anthony", "juan"]
                 },
                 {
                     id: 2,
-                    username : "juan",
-                    nombre: "Juan",
-                    apellido: "Sanchez",
-                    imagen : "https://labs.openviewpartners.com/wp-content/uploads/2016/02/Mike-King-300x300.png"
+                    peers: ["anthony", "pedro"]
                 },
                 {
                     id: 3,
-                    username : "pedro",
-                    nombre: "Pedro",
-                    apellido: "Perez",
-                    imagen : "http://www.hemorroidestratamientoycura.com/wp-content/uploads/2012/10/doctor.png"
+                    peers: ["pedro", "juan"]
+                }
+            ],
+            conversations: [{
+                    id: 1,
+                    connections_id: 1,
+                    messages: []
+                },
+                {
+                    id: 2,
+                    connections_id: 2,
+                    messages: []
+                },
+                {
+                    id: 3,
+                    connections_id: 3,
+                    messages: []
                 }
             ]
+
         };
 
-        
-        
+
+
+        var encontrar = find(db.users, "username", "juan");
+        console.log("valor encontrado");
+        console.log(encontrar);
+
+
 
 
         new PerfectScrollbar('#message-box');
@@ -325,7 +332,7 @@
 
         $(function () {
 
-            
+
 
             $('#toggleInfo').click(function () {
                 if (toggle) {
@@ -353,11 +360,36 @@
 
             var username = prompt("Introduce tu nombre de usuario", "");
 
-            // Cargar los usuarios
-            $.each(db.users, function(key, value) {
-                if(value.username!=username) {
-                    $("#user-section").append("<div id='"+value.username+"' class='media user'> <img class='mr-3 rounded-circle' width='64' height='64' src='"+value.imagen+"' alt='Generic placeholder image'> <div class='media-body'> <h5 class='mt-0'>"+value.nombre + " " + value.apellido +" <small>("+value.username+")</small> </h5> <span id='last_message'></span> </div><button type='button' class='close' aria-label='Close'> <span aria-hidden='true'>&times;</span> </button> </div>");
-                }
+            // Cargar las conversaciones
+            $.each(db.connections, function (key, value) {
+                $.each(value.peers, function (key1, value1) {
+                    if (value1 == username) {
+                        $.each(value.peers, function (key2, value2) {
+                            if (value2 != username) {
+                                var id_conversation = value.id;
+                                $.each(db.users, function (key3, value3) {
+
+                                    if (value3.username == value2) {
+                                        $("#user-section").append("<div id='" +
+                                            value3.username +
+                                            "' class='media user " +
+                                            id_conversation +
+                                            "'> <img class='mr-3 rounded-circle' width='64' height='64' src='" +
+                                            value3.imagen +
+                                            "' alt='Generic placeholder image'> <div class='media-body'> <h5 class='mt-0'>" +
+                                            value3.nombre + " " + value3.apellido +
+                                            " <small>(" + value3.username +
+                                            ")</small> </h5> <span id='last_message'></span> </div><button type='button' class='close' aria-label='Close'> <span aria-hidden='true'>&times;</span> </button> </div>"
+                                        );
+                                    }
+                                });
+
+
+                            }
+                        });
+                    }
+                });
+
             });
 
 
@@ -369,15 +401,15 @@
                 path: '/peerjs',
                 debug: 3,
                 config: {
-                    'iceServers':
-                        [
-                            { url: 'stun:stun1.l.google.com:19302' },
-                            {
-                                url: 'turn:numb.viagenie.ca',
-                                credential: 'muazkh',
-                                username: 'webrtc@live.com'
-                            }
-                        ]
+                    'iceServers': [{
+                            url: 'stun:stun1.l.google.com:19302'
+                        },
+                        {
+                            url: 'turn:numb.viagenie.ca',
+                            credential: 'muazkh',
+                            username: 'webrtc@live.com'
+                        }
+                    ]
                 }
             });
 
@@ -391,49 +423,67 @@
             peer.on('error', function (err) {
                 switch (err.type) {
                     case 'browser-incompatible':
-                        alert("browser-incompatible: The client's browser does not support some or all WebRTC features that you are trying to use.");
+                        console.log(
+                            "browser-incompatible: The client's browser does not support some or all WebRTC features that you are trying to use."
+                        );
                         break;
                     case 'disconnected':
-                        alert("disconnected: You've already disconnected this peer from the server and can no longer make any new connections on it.");
+                        console.log(
+                            "disconnected: You've already disconnected this peer from the server and can no longer make any new connections on it."
+                        );
                         break;
                     case 'invalid-id':
-                        alert("invalid-id: The ID passed into the Peer constructor contains illegal characters.");
+                        console.log(
+                            "invalid-id: The ID passed into the Peer constructor contains illegal characters."
+                        );
                         break;
                     case 'invalid-key':
-                        alert("invalid-key: The API key passed into the Peer constructor contains illegal characters or is not in the system (cloud server only).");
+                        console.log(
+                            "invalid-key: The API key passed into the Peer constructor contains illegal characters or is not in the system (cloud server only)."
+                        );
                         break;
                     case 'network':
-                        alert("network: Lost or cannot establish a connection to the signalling server.");
+                        console.log(
+                            "network: Lost or cannot establish a connection to the signalling server."
+                        );
                         break;
                     case 'peer-unavailable':
-                        alert("peer-unavailable: The peer you're trying to connect to does not exist.");
+                        console.log(
+                            "peer-unavailable: The peer you're trying to connect to does not exist."
+                        );
+                        $('.text-header small').html("Desconectado");
                         break;
                     case 'ssl-unavailable':
-                        alert("ssl-unavailable: PeerJS is being used securely, but the cloud server does not support SSL. Use a custom PeerServer.");
+                        console.log(
+                            "ssl-unavailable: PeerJS is being used securely, but the cloud server does not support SSL. Use a custom PeerServer."
+                        );
                         break;
                     case 'server-error':
-                        alert("server-error: Unable to reach the server.");
+                        console.log("server-error: Unable to reach the server.");
                         break;
                     case 'socket-error':
-                        alert("socket-error: An error from the underlying socket.");
+                        console.log("socket-error: An error from the underlying socket.");
                         break;
                     case 'socket-closed':
-                        alert("socket-closed: The underlying socket closed unexpectedly.");
+                        console.log("socket-closed: The underlying socket closed unexpectedly.");
                         break;
                     case 'unavailable-id':
-                        alert("unavailable-id: The ID passed into the Peer constructor is already taken.");
+                        console.log(
+                            "unavailable-id: The ID passed into the Peer constructor is already taken."
+                        );
                         break;
                     case 'webrtc':
-                        alert("webrtc: Native WebRTC errors.");
+                        console.log("webrtc: Native WebRTC errors.");
                         break;
                     default:
-                        alert("An unexpected error has ocurred");
+                        console.log("An unexpected error has ocurred");
                         break;
                 }
             });
 
             // Este evento se ejecuta al detectar la llamada de un usuario
             peer.on('call', function (call) {
+                console.log(call);
                 var acceptsCall = confirm("Videollamada entrante, desea responder?");
                 if (acceptsCall) {
                     call.answer(window.localStream);
@@ -443,10 +493,16 @@
                         window.peer_stream = stream;
                         // Muestra la trasmision del usuario conectado en mi camara
                         onReceiveStream(stream, 'peer-camera');
+                        $('#camera').removeClass('d-none');
+                        $('#info').addClass('d-none');
+                        $("#hangup").prop("disabled", false);
+                        $("#call").prop("disabled", true);
+                        
                     });
                     // Se ejecuta cuando la llamada finaliza
                     call.on('close', function () {
-                        alert("The videocall has finished");
+                        $('#camera').addClass('d-none');
+                        $('#info').removeClass('d-none');
                     });
                 } else {
                     console.log("Call denied !");
@@ -460,46 +516,52 @@
             // Esta funcion se ejecuta cuando un usuario conecta con otro, y se dispara en el evento 'connection'
             function connect(c) {
 
+
+
                 if (c.label === 'chat') {
-                    //var chatbox = $('<div></div>').addClass('connection').addClass('active').attr('id', c.peer);
-                    //var header = $('<h1></h1>').html(c.peer);
-                   // var messages = $('<div><em>Conectados</em></div>').addClass('messages');
 
-                    //chatbox.append(header);
-                   // chatbox.append(messages);
-
-
-                    //chatbox.on('click', function () {
-                    //    if ($(this).attr('class').indexOf('active') === -1) {
-                    //        $(this).addClass('active');
-                    //    } else {
-                    //        $(this).removeClass('active');
-                    //    }
-                   // });
-                    //$('.filler').hide();
-                   // $('#connections').append(chatbox);
 
                     c.on('data', function (data) {
-                        console.log(data);
-                        $('#'+c.peer+" span#last_message").html(data);
-                        $('#messages-section').append("<div class='border border-secondary rounded'>"+data+"</div>");
+                        $.each(db.conversations, function (key, value) {
+                            if (value.connections_id == c.metadata.conversation_id) {
+                                var obj = {
+                                    from: c.peer,
+                                    message: data
+                                };
+                                db.conversations[key].messages.push(obj);
+                            }
+                        });
+
+                        $('#' + c.peer + " span#last_message").html(data);
+
+                        if (typeof $('.active')["0"].id !== "undefined") {
+                            if ($('.active')["0"].id == c.peer) {
+                                $('#messages-section').append(
+                                    "<div class='border border-secondary rounded'>" +
+                                    data + "</div>");
+                            }
+                        }
+
+
+
                     });
 
                     c.on('close', function () {
-                        $('#'+c.peer+" span#last_message").html("Desconectado");
+                        $('#' + c.peer + " span#last_message").html("Desconectado");
                         delete connectedPeers[c.peer];
                     });
                 } else if (c.label === 'file') {
                     c.on('data', function (data) {
-                        
+
 
                         if (data.constructor === ArrayBuffer) {
                             var dataView = new Uint8Array(data);
                             var dataBlob = new Blob([dataView]);
-                            
+
                             var url = window.URL.createObjectURL(dataBlob);
-                            $('#'+c.peer+" span#last_message").html(c.peer + " te ha enviado un <a href='"+url+"'>archivo</a>");
-                            
+                            $('#' + c.peer + " span#last_message").html(c.peer +
+                                " te ha enviado un <a href='" + url + "'>archivo</a>");
+
                         }
                     });
                 }
@@ -518,7 +580,9 @@
                     if (c.label === 'file') {
                         c.send(file);
                         console.log(file);
-                        $('#messages-section').append("<div class='border border-secondary rounded me'>"+file.name+" ("+file.size+" bytes)</div>");
+                        $('#messages-section').append(
+                            "<div class='border border-secondary rounded me'>" + file.name +
+                            " (" + file.size + " bytes)</div>");
                     }
                 });
             });
@@ -531,52 +595,83 @@
 
             // Esta funcion se ejecuta al hacer clic sobre el boton 'conectar'
 
-            $('.user').click(function(e) {
+            $('.user').click(function (e) {
+                var conversation_id = e.currentTarget.classList[2];
                 var requestedPeer = e.currentTarget.id;
                 $('.user').removeClass('active');
-                $('#'+requestedPeer).addClass('active');
+                $('#' + requestedPeer).addClass('active');
                 if (!connectedPeers[requestedPeer]) {
                     var c = peer.connect(requestedPeer, {
                         label: 'chat',
                         serialization: 'none',
-                        metadata: { message: '' }
+                        metadata: {
+                            conversation_id: conversation_id,
+                            requestedPeer: requestedPeer
+                        }
                     });
                     c.on('open', function () {
                         connect(c);
                     });
-                    c.on('error', function (err) { alert(err); });
-                    var f = peer.connect(requestedPeer, { label: 'file', reliable: true });
+                    c.on('error', function (err) {
+                        alert(err);
+                    });
+                    var f = peer.connect(requestedPeer, {
+                        label: 'file',
+                        reliable: true
+                    });
                     f.on('open', function () {
                         connect(f);
                     });
-                    f.on('error', function (err) { alert(err); });
+                    f.on('error', function (err) {
+                        alert(err);
+                    });
                 }
                 connectedPeers[requestedPeer] = 1;
+
+
+                $('#chatbox-section').removeClass('d-none');
+                $('#camera-section').removeClass('d-none');
+
+
+
+
+                $.each(db.users, function (key, value) {
+                    if (value.username == requestedPeer) {
+                        $('.text-header').html("<p>" + value.nombre + " " + value.apellido +
+                            "<br><small></small></p>");
+                        $('#user-camera').html(value.nombre + " " + value.apellido);
+                        $('#info-name').html(value.nombre + " " + value.apellido);
+                        $('#info-username').html(value.username);
+                        $('#info-image').prop("src", value.imagen);
+                    }
+                });
+
+                $('#messages-section').html("");
+
+                $.each(db.conversations, function (key, value) {
+                    if (value.connections_id == conversation_id) {
+                        $.each(value.messages, function (key1, value1) {
+                            if (value1.from == username) {
+                                $('#messages-section').append(
+                                    "<div class='border border-secondary rounded me'>" +
+                                    value1.message +
+                                    "</div>");
+                            } else {
+                                $('#messages-section').append(
+                                    "<div class='border border-secondary rounded'>" +
+                                    value1.message +
+                                    "</div>");
+                            }
+                        });
+                    }
+                });
+
+
+
             });
 
 
-            // $('#connect').click(function () {
-            //     var requestedPeer = $('#rid').val();
-            //     if (!connectedPeers[requestedPeer]) {
-            //         var c = peer.connect(requestedPeer, {
-            //             label: 'chat',
-            //             serialization: 'none',
-            //             metadata: { message: '' }
-            //         });
-            //         c.on('open', function () {
-            //             connect(c);
-            //         });
-            //         c.on('error', function (err) { alert(err); });
-            //         var f = peer.connect(requestedPeer, { label: 'file', reliable: true });
-            //         f.on('open', function () {
-            //             connect(f);
-            //         });
-            //         f.on('error', function (err) { alert(err); });
-            //     }
-            //     connectedPeers[requestedPeer] = 1;
-            // });
 
-            // Esta funcion se ejecuta al hacer click sobre el boton 'cerrar'
             $('#close').click(function () {
                 eachActiveConnection(function (c) {
                     c.close();
@@ -585,7 +680,7 @@
 
             // Esta funcion se ejecuta al hacer click sobre el boton enviar
             $('#send').submit(function (e) {
-                
+
                 e.preventDefault();
 
                 var msg = $('#message-text').val();
@@ -593,34 +688,84 @@
                     if (c.label === 'chat') {
                         console.log($c);
                         c.send(msg);
-                        $('#messages-section').append("<div class='border border-secondary rounded me'>"+msg+"</div>");
+
+
+
+                        $.each(db.conversations, function (key, value) {
+                            if (value.connections_id == c.metadata.conversation_id) {
+                                var obj = {
+                                    from: username,
+                                    message: msg
+                                };
+                                db.conversations[key].messages.push(obj);
+                            }
+                        });
+
+
+                        $('#messages-section').append(
+                            "<div class='border border-secondary rounded me'>" + msg +
+                            "</div>");
                     }
                 });
                 $('#message-text').val('');
                 $('#message-text').focus();
             });
 
+            $('#message-text').on('keypress', function (e) {
+                if (e.which === 13) {
+
+                    $(this).attr("disabled", "disabled");
+
+                    var msg = $('#message-text').val();
+                    eachActiveConnection(function (c, $c) {
+                        if (c.label === 'chat') {
+                            console.log($c);
+                            c.send(msg);
+
+
+
+                            $.each(db.conversations, function (key, value) {
+                                if (value.connections_id == c.metadata.conversation_id) {
+                                    var obj = {
+                                        from: username,
+                                        message: msg
+                                    };
+                                    db.conversations[key].messages.push(obj);
+                                }
+                            });
+
+
+                            $('#messages-section').append(
+                                "<div class='border border-secondary rounded me'>" + msg +
+                                "</div>");
+                        }
+                    });
+                    $('#message-text').val('');
+                    $('#message-text').focus();
+
+                    $(this).removeAttr("disabled");
+                }
+            });
 
             $("#call").click(function () {
-                // Solicitar mostrar mi camara
-                
-
                 $("#hangup").prop("disabled", false);
                 $("#call").prop("disabled", true);
-               
-
                 eachActiveConnection(function (c, $c) {
                     var call = peer.call(c.peer, window.localStream);
                     call.on('stream', function (stream) {
                         window.peer_stream = stream;
                         onReceiveStream(stream, 'peer-camera');
+                        $('#camera').removeClass('d-none');
+                        $('#info').addClass('d-none');
                     });
 
                     $("#hangup").click(function () {
                         call.close();
                         $("#hangup").prop("disabled", true);
                         $("#call").prop("disabled", false);
-                    }, false);
+                        $('#camera').addClass('d-none');
+                        $('#info').removeClass('d-none');
+                    });
                 });
             });
 
@@ -641,20 +786,17 @@
                 });
             }
 
+            // Solicitar mostrar mi camara
             requestLocalVideo({
-                    success: function (stream) {
-                        window.localStream = stream;
-                        onReceiveStream(stream, 'my-camera');
-                    },
-                    error: function (err) {
-                        alert("Cannot get access to your camera and video !");
-                        console.error(err);
-                    }
-                });
-
-
-
-
+                success: function (stream) {
+                    window.localStream = stream;
+                    onReceiveStream(stream, 'my-camera');
+                },
+                error: function (err) {
+                    alert("Cannot get access to your camera and video !");
+                    console.error(err);
+                }
+            });
         });
 
         // Esta funcion se ejecuta antes de cerrar el navegador destruyendo la conexion del usuario en el servidor de PeerJS
@@ -666,7 +808,10 @@
 
         function requestLocalVideo(callbacks) {
             navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-            navigator.getUserMedia({ audio: true, video: true }, callbacks.success, callbacks.error);
+            navigator.getUserMedia({
+                audio: true,
+                video: true
+            }, callbacks.success, callbacks.error);
         }
 
         function onReceiveStream(stream, element_id) {
@@ -674,12 +819,6 @@
             video.src = window.URL.createObjectURL(stream);
             window.peer_stream = stream;
         }
-
-
-
-
-
-
     </script>
 </body>
 
