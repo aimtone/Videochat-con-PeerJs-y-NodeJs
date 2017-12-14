@@ -1,0 +1,15 @@
+{
+    "users": [
+      { "id": 1, "username": "anthony", "password": "123456", "name": "Anthony", "lastname": "Medina", "type": "Med" },
+      { "id": 2, "username": "marco", "password": "123456", "name": "Marco", "lastname": "Mastantuono", "type": "Med" },
+      { "id": 3, "username": "yohandri", "password": "123456", "name": "Yohandri", "lastname": "Ramirez", "type": "Med" },
+      { "id": 4, "username": "juan",  "password": "123456", "name": "Juan", "lastname": "Perez", "type": "Pac" },
+      { "id": 5, "username": "jose",  "password": "123456", "name": "Jose", "lastname": "Sanchez", "type": "Pac" },
+      { "id": 6, "username": "miguel", "password": "123456", "name": "Miguel", "lastname": "Salas", "type": "Pac" }
+    ],
+    "connections": [
+        { "id": 1, "user_id": 1, "connections": [4, 5]},
+        { "id": 2, "user_id": 2, "connections": [5, 6]},
+        { "id": 3, "user_id": 3, "connections": [4]}
+    ]
+}

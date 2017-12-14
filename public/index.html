@@ -1,0 +1,686 @@
+<!doctype html>
+<html lang="en" oncontextmenu="">
+
+<head>
+    <title>Hello, world!</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb"
+        crossorigin="anonymous">
+    <link rel="stylesheet" href="https://rawgit.com/utatti/perfect-scrollbar/master/css/perfect-scrollbar.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/open-iconic/1.1.1/font/css/open-iconic.css" rel="stylesheet">
+
+    <style>
+        * {
+            cursor: default;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        #content-wrap {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+        }
+
+        #content-wrap #user-section {
+            border-right: 1px solid #ccc;
+            border-top: 1px solid #ccc;
+            height: 100%;
+            overflow: hidden;
+            padding-bottom: 50px;
+        }
+
+        #content-wrap #user-section .user {
+            border-bottom: 1px solid #ccc;
+            padding: 5px 5px 5px 5px;
+            margin: 0px -15px 0px -15px;
+        }
+
+        #content-wrap #user-section .user:hover {
+            background: #f8f9fa !important;
+        }
+
+        #content-wrap #chatbox-section {
+            border-right: 1px solid #ccc;
+            border-top: 1px solid #ccc;
+            height: 100%;
+        }
+
+        #content-wrap #chatbox-section #chat-section {
+            height: 100%;
+            width: 100%;
+            position: absolute;
+        }
+
+        #message-box {
+            overflow: hidden !important;
+            min-height: 70%;
+            max-height: 70%;
+            height: 70%;
+            width: 100%;
+            top: 88px;
+            left: 0px;
+            position: absolute;
+            padding: 10px 10px 20px 10px;
+        }
+
+        #content-wrap #chatbox-section #messages-section div {
+            clear: both;
+            background: #f8f9fa;
+            float: left;
+            max-width: 80%;
+            min-width: 20%;
+            text-align: left;
+            word-wrap: break-word;
+            margin-top: 10px;
+            padding: 5px 5px 5px 5px;
+
+        }
+
+        #content-wrap #chatbox-section #messages-section div.me {
+            background: #17a2b8;
+            float: right;
+            text-align: right;
+            color: white;
+            border: 1px solid #17a2b8 !important;
+        }
+
+        #content-wrap #chatbox-section #textarea-section {
+            min-height: 10%;
+            max-height: 10%;
+            height: 10%;
+            width: 100%;
+            bottom: 45px;
+            left: 0px;
+            position: absolute;
+            border-top: 1px solid #ccc;
+        }
+
+        #content-wrap #chatbox-section #textarea-section textarea {
+            outline: none !important;
+            box-shadow: none;
+            border: none;
+            resize: none;
+            overflow: hidden !important;
+        }
+
+        #content-wrap #camera-section {
+            border-top: 1px solid #ccc;
+            height: 100%;
+        }
+
+        .active { 
+            background: #17a2b8;
+        }
+
+        .aquamarine {
+            background: #17a2b8 !important;
+            color: white !important;
+        }
+
+        .aquamarine a,
+        .aquamarine div a {
+            color: white !important;
+        }
+
+        .aquamarine .dropdown-item {
+            color: black !important;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light aquamarine">
+        <a class="navbar-brand" href="#">VideoChat</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+            aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true"
+                        aria-expanded="false">
+                        Acciones
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="#">Desconectarme</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="#">Cerrar sesion</a>
+                    </div>
+                </li>
+
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row" id="content-wrap">
+            <div class="col col-sm-12 col-md-12 col-lg-3" id="user-section"></div>
+
+            <div class="col col-lg-6 bg-light d-sm-none d-md-block d-none d-sm-block" id="chatbox-section">
+                <div class="row">
+                    <div class="card border-light mb-3" id="chat-section">
+                        <div class="card-header">
+                            <div class="row">
+                                <div class="col col-sm-6">
+                                    <p>Anthony Medina
+                                        <br>
+                                        <small>Conectado actualmente</small>
+                                    </p>
+                                </div>
+                                <div class="col col-sm-6 text-right">
+                                    <button id="call" type="button" class="btn btn-primary btn-sm ">
+                                        <span class="oi" data-glyph="phone"></span>
+                                    </button>
+                                    <button disabled="disabled" id="hangup" type="button" class="btn btn-primary btn-sm">
+                                        Colgar
+                                    </button>
+                                    <button type="button" id="toggleInfo" data-toggle="button" aria-pressed="false" class="btn btn-primary btn-sm ">
+                                        <span class="oi" data-glyph="eye"></span>
+                                    </button>
+                                </div>
+                            </div>
+
+
+
+
+                        </div>
+                        <div class="card-body">
+                            <div id="message-box" class="card-text">
+                                <div id="messages-section"></div>
+                            </div>
+
+                            <div id="textarea-section">
+                                <form id="send">
+                                    <div class="row">
+                                        <div class="col col-sm-10">
+                                            <textarea placeholder="Escriba su texto aqui" class="form-control" id="message-text"></textarea>
+                                        </div>
+                                        <div class="col col-sm-2">
+                                            <button type="submit" class="btn btn-primary btn-sm ">Enviar</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col col-lg-3 d-sm-none d-md-block d-none d-sm-block" id="camera-section">
+                <div class="row">
+
+                    <div id="camera" class="d-block">
+                        <div class="card col col-sm-12">
+                            <video id="peer-camera" width="100%" autoplay="autoplay" class="center-block"></video>
+                            <h6>Anthony Medina</h6>
+                        </div>
+                        <div class="card col col-sm-12">
+                            <video id="my-camera" width="100%" autoplay="autoplay" muted="true" class="center-block"></video>
+                            <h6>Yo</h6>
+                        </div>
+                    </div>
+
+                    <div id="info" class="col col-sm-12 col-md-12 col-lg-12 text-center">
+                        <br>
+                        <img width="150" height="150" class=" img-fluid rounded-circle border border-secondary" src="https://www.cryptocompare.com/media/19582/icon-user-default.png"
+                            alt="Card image cap">
+                        <div class="card-body">
+                            <h4 class="card-title">Anthony Medina</h4>
+                            <p class="card-text">Medico Cirujano</p>
+                        </div>
+
+                    </div>
+
+
+
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+        crossorigin="anonymous"></script>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh"
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ"
+        crossorigin="anonymous"></script>
+    <script src="https://rawgit.com/utatti/perfect-scrollbar/master/dist/perfect-scrollbar.js"></script>
+    <script src="resources/js/peer.min.js"></script>
+
+    <script>
+
+        var db = {
+            users: [
+                {
+                    id: 1,
+                    username : "anthony",
+                    nombre: "Anthony",
+                    apellido: "Medina",
+                    imagen : "http://www.tuestima.com/wp-content/uploads/2015/11/Entrevista-Dr-Nicholas-Perricone.jpg"
+                },
+                {
+                    id: 2,
+                    username : "juan",
+                    nombre: "Juan",
+                    apellido: "Sanchez",
+                    imagen : "https://labs.openviewpartners.com/wp-content/uploads/2016/02/Mike-King-300x300.png"
+                },
+                {
+                    id: 3,
+                    username : "pedro",
+                    nombre: "Pedro",
+                    apellido: "Perez",
+                    imagen : "http://www.hemorroidestratamientoycura.com/wp-content/uploads/2012/10/doctor.png"
+                }
+            ],
+            conversations: [
+                {
+                    id: 1,
+                    username : "anthony",
+                    nombre: "Anthony",
+                    apellido: "Medina",
+                    imagen : "http://www.tuestima.com/wp-content/uploads/2015/11/Entrevista-Dr-Nicholas-Perricone.jpg"
+                },
+                {
+                    id: 2,
+                    username : "juan",
+                    nombre: "Juan",
+                    apellido: "Sanchez",
+                    imagen : "https://labs.openviewpartners.com/wp-content/uploads/2016/02/Mike-King-300x300.png"
+                },
+                {
+                    id: 3,
+                    username : "pedro",
+                    nombre: "Pedro",
+                    apellido: "Perez",
+                    imagen : "http://www.hemorroidestratamientoycura.com/wp-content/uploads/2012/10/doctor.png"
+                }
+            ]
+        };
+
+        
+        
+
+
+        new PerfectScrollbar('#message-box');
+        new PerfectScrollbar('#user-section');
+        var toggle = false;
+
+        $(function () {
+
+            
+
+            $('#toggleInfo').click(function () {
+                if (toggle) {
+                    $("#camera-section").animate({
+                        left: "-=350",
+                        width: "toggle"
+                    }, 100, function () {
+                        toggle = false;
+                        $('#chatbox-section').removeClass('col-lg-9');
+                        $('#chatbox-section').addClass('col-lg-6');
+                    });
+                } else {
+                    $("#camera-section").animate({
+                        left: "+=350",
+                        width: "toggle"
+                    }, 100, function () {
+                        toggle = true;
+                        $('#chatbox-section').removeClass('col-lg-6');
+                        $('#chatbox-section').addClass('col-lg-9');
+                    });
+                }
+
+            });
+
+
+            var username = prompt("Introduce tu nombre de usuario", "");
+
+            // Cargar los usuarios
+            $.each(db.users, function(key, value) {
+                if(value.username!=username) {
+                    $("#user-section").append("<div id='"+value.username+"' class='media user'> <img class='mr-3 rounded-circle' width='64' height='64' src='"+value.imagen+"' alt='Generic placeholder image'> <div class='media-body'> <h5 class='mt-0'>"+value.nombre + " " + value.apellido +" <small>("+value.username+")</small> </h5> <span id='last_message'></span> </div><button type='button' class='close' aria-label='Close'> <span aria-hidden='true'>&times;</span> </button> </div>");
+                }
+            });
+
+
+            var connectedPeers = {};
+
+            var peer = new Peer(username, {
+                host: "192.168.0.178",
+                port: 9000,
+                path: '/peerjs',
+                debug: 3,
+                config: {
+                    'iceServers':
+                        [
+                            { url: 'stun:stun1.l.google.com:19302' },
+                            {
+                                url: 'turn:numb.viagenie.ca',
+                                credential: 'muazkh',
+                                username: 'webrtc@live.com'
+                            }
+                        ]
+                }
+            });
+
+
+            // Este evento se ejecuta al conectar al usuario al servidor de PeerJS
+            peer.on('open', function (id) {
+                $('#pid').html(id);
+            });
+
+            // Este evento se ejecuta cuando ocurra un error al conectarse al servidor de PeerJS
+            peer.on('error', function (err) {
+                switch (err.type) {
+                    case 'browser-incompatible':
+                        alert("browser-incompatible: The client's browser does not support some or all WebRTC features that you are trying to use.");
+                        break;
+                    case 'disconnected':
+                        alert("disconnected: You've already disconnected this peer from the server and can no longer make any new connections on it.");
+                        break;
+                    case 'invalid-id':
+                        alert("invalid-id: The ID passed into the Peer constructor contains illegal characters.");
+                        break;
+                    case 'invalid-key':
+                        alert("invalid-key: The API key passed into the Peer constructor contains illegal characters or is not in the system (cloud server only).");
+                        break;
+                    case 'network':
+                        alert("network: Lost or cannot establish a connection to the signalling server.");
+                        break;
+                    case 'peer-unavailable':
+                        alert("peer-unavailable: The peer you're trying to connect to does not exist.");
+                        break;
+                    case 'ssl-unavailable':
+                        alert("ssl-unavailable: PeerJS is being used securely, but the cloud server does not support SSL. Use a custom PeerServer.");
+                        break;
+                    case 'server-error':
+                        alert("server-error: Unable to reach the server.");
+                        break;
+                    case 'socket-error':
+                        alert("socket-error: An error from the underlying socket.");
+                        break;
+                    case 'socket-closed':
+                        alert("socket-closed: The underlying socket closed unexpectedly.");
+                        break;
+                    case 'unavailable-id':
+                        alert("unavailable-id: The ID passed into the Peer constructor is already taken.");
+                        break;
+                    case 'webrtc':
+                        alert("webrtc: Native WebRTC errors.");
+                        break;
+                    default:
+                        alert("An unexpected error has ocurred");
+                        break;
+                }
+            });
+
+            // Este evento se ejecuta al detectar la llamada de un usuario
+            peer.on('call', function (call) {
+                var acceptsCall = confirm("Videollamada entrante, desea responder?");
+                if (acceptsCall) {
+                    call.answer(window.localStream);
+                    // Recibir data
+                    call.on('stream', function (stream) {
+                        // Guardar un referencia global de la informacion transmitida
+                        window.peer_stream = stream;
+                        // Muestra la trasmision del usuario conectado en mi camara
+                        onReceiveStream(stream, 'peer-camera');
+                    });
+                    // Se ejecuta cuando la llamada finaliza
+                    call.on('close', function () {
+                        alert("The videocall has finished");
+                    });
+                } else {
+                    console.log("Call denied !");
+                }
+            });
+
+
+            // Este evento se ejecuta cuando se detecta una nueva conexion con un usuario
+            peer.on('connection', connect);
+
+            // Esta funcion se ejecuta cuando un usuario conecta con otro, y se dispara en el evento 'connection'
+            function connect(c) {
+
+                if (c.label === 'chat') {
+                    //var chatbox = $('<div></div>').addClass('connection').addClass('active').attr('id', c.peer);
+                    //var header = $('<h1></h1>').html(c.peer);
+                   // var messages = $('<div><em>Conectados</em></div>').addClass('messages');
+
+                    //chatbox.append(header);
+                   // chatbox.append(messages);
+
+
+                    //chatbox.on('click', function () {
+                    //    if ($(this).attr('class').indexOf('active') === -1) {
+                    //        $(this).addClass('active');
+                    //    } else {
+                    //        $(this).removeClass('active');
+                    //    }
+                   // });
+                    //$('.filler').hide();
+                   // $('#connections').append(chatbox);
+
+                    c.on('data', function (data) {
+                        console.log(data);
+                        $('#'+c.peer+" span#last_message").html(data);
+                        $('#messages-section').append("<div class='border border-secondary rounded'>"+data+"</div>");
+                    });
+
+                    c.on('close', function () {
+                        $('#'+c.peer+" span#last_message").html("Desconectado");
+                        delete connectedPeers[c.peer];
+                    });
+                } else if (c.label === 'file') {
+                    c.on('data', function (data) {
+                        
+
+                        if (data.constructor === ArrayBuffer) {
+                            var dataView = new Uint8Array(data);
+                            var dataBlob = new Blob([dataView]);
+                            
+                            var url = window.URL.createObjectURL(dataBlob);
+                            $('#'+c.peer+" span#last_message").html(c.peer + " te ha enviado un <a href='"+url+"'>archivo</a>");
+                            
+                        }
+                    });
+                }
+                connectedPeers[c.peer] = 1;
+            }
+
+
+
+            var box = $('#message-box');
+            box.on('dragenter', doNothing);
+            box.on('dragover', doNothing);
+            box.on('drop', function (e) {
+                e.originalEvent.preventDefault();
+                var file = e.originalEvent.dataTransfer.files[0];
+                eachActiveConnection(function (c, $c) {
+                    if (c.label === 'file') {
+                        c.send(file);
+                        console.log(file);
+                        $('#messages-section').append("<div class='border border-secondary rounded me'>"+file.name+" ("+file.size+" bytes)</div>");
+                    }
+                });
+            });
+
+            // Funcion nula
+            function doNothing(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            // Esta funcion se ejecuta al hacer clic sobre el boton 'conectar'
+
+            $('.user').click(function(e) {
+                var requestedPeer = e.currentTarget.id;
+                $('.user').removeClass('active');
+                $('#'+requestedPeer).addClass('active');
+                if (!connectedPeers[requestedPeer]) {
+                    var c = peer.connect(requestedPeer, {
+                        label: 'chat',
+                        serialization: 'none',
+                        metadata: { message: '' }
+                    });
+                    c.on('open', function () {
+                        connect(c);
+                    });
+                    c.on('error', function (err) { alert(err); });
+                    var f = peer.connect(requestedPeer, { label: 'file', reliable: true });
+                    f.on('open', function () {
+                        connect(f);
+                    });
+                    f.on('error', function (err) { alert(err); });
+                }
+                connectedPeers[requestedPeer] = 1;
+            });
+
+
+            // $('#connect').click(function () {
+            //     var requestedPeer = $('#rid').val();
+            //     if (!connectedPeers[requestedPeer]) {
+            //         var c = peer.connect(requestedPeer, {
+            //             label: 'chat',
+            //             serialization: 'none',
+            //             metadata: { message: '' }
+            //         });
+            //         c.on('open', function () {
+            //             connect(c);
+            //         });
+            //         c.on('error', function (err) { alert(err); });
+            //         var f = peer.connect(requestedPeer, { label: 'file', reliable: true });
+            //         f.on('open', function () {
+            //             connect(f);
+            //         });
+            //         f.on('error', function (err) { alert(err); });
+            //     }
+            //     connectedPeers[requestedPeer] = 1;
+            // });
+
+            // Esta funcion se ejecuta al hacer click sobre el boton 'cerrar'
+            $('#close').click(function () {
+                eachActiveConnection(function (c) {
+                    c.close();
+                });
+            });
+
+            // Esta funcion se ejecuta al hacer click sobre el boton enviar
+            $('#send').submit(function (e) {
+                
+                e.preventDefault();
+
+                var msg = $('#message-text').val();
+                eachActiveConnection(function (c, $c) {
+                    if (c.label === 'chat') {
+                        console.log($c);
+                        c.send(msg);
+                        $('#messages-section').append("<div class='border border-secondary rounded me'>"+msg+"</div>");
+                    }
+                });
+                $('#message-text').val('');
+                $('#message-text').focus();
+            });
+
+
+            $("#call").click(function () {
+                // Solicitar mostrar mi camara
+                
+
+                $("#hangup").prop("disabled", false);
+                $("#call").prop("disabled", true);
+               
+
+                eachActiveConnection(function (c, $c) {
+                    var call = peer.call(c.peer, window.localStream);
+                    call.on('stream', function (stream) {
+                        window.peer_stream = stream;
+                        onReceiveStream(stream, 'peer-camera');
+                    });
+
+                    $("#hangup").click(function () {
+                        call.close();
+                        $("#hangup").prop("disabled", true);
+                        $("#call").prop("disabled", false);
+                    }, false);
+                });
+            });
+
+            // Esta funcion controla el envio de datos a todas las conexiones activas
+            function eachActiveConnection(fn) {
+                var actives = $('.active');
+                var checkedIds = {};
+                actives.each(function () {
+                    var peerId = $(this).attr('id');
+                    if (!checkedIds[peerId]) {
+                        var conns = peer.connections[peerId];
+                        for (var i = 0, ii = conns.length; i < ii; i += 1) {
+                            var conn = conns[i];
+                            fn(conn, $(this));
+                        }
+                    }
+                    checkedIds[peerId] = 1;
+                });
+            }
+
+            requestLocalVideo({
+                    success: function (stream) {
+                        window.localStream = stream;
+                        onReceiveStream(stream, 'my-camera');
+                    },
+                    error: function (err) {
+                        alert("Cannot get access to your camera and video !");
+                        console.error(err);
+                    }
+                });
+
+
+
+
+        });
+
+        // Esta funcion se ejecuta antes de cerrar el navegador destruyendo la conexion del usuario en el servidor de PeerJS
+        window.onunload = window.onbeforeunload = function (e) {
+            if (!!peer && !peer.destroyed) {
+                peer.destroy();
+            }
+        };
+
+        function requestLocalVideo(callbacks) {
+            navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+            navigator.getUserMedia({ audio: true, video: true }, callbacks.success, callbacks.error);
+        }
+
+        function onReceiveStream(stream, element_id) {
+            var video = document.getElementById(element_id);
+            video.src = window.URL.createObjectURL(stream);
+            window.peer_stream = stream;
+        }
+
+
+
+
+
+
+    </script>
+</body>
+
+</html>
