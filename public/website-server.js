@@ -45,3 +45,4 @@ app.get('/', function (req, res) {
 });
 
 app.use('/resources', express.static('./source'));
+app.use('/sounds', express.static('./sounds'));

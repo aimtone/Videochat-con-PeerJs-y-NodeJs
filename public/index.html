@@ -250,16 +250,16 @@
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
         crossorigin="anonymous"></script>
-
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh"
         crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ"
         crossorigin="anonymous"></script>
     <script src="https://rawgit.com/utatti/perfect-scrollbar/master/dist/perfect-scrollbar.js"></script>
     <script src="resources/js/peer.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ion-sound/3.0.7/js/ion.sound.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 
     <script>
         var db = {
@@ -317,18 +317,52 @@
 
         };
 
+        var entityMap = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;',
+            '/': '&#x2F;',
+            '`': '&#x60;',
+            '=': '&#x3D;'
+        };
+
+        function escapeHtml(string) {
+            return String(string).replace(/[&<>"'`=\/]/g, function (s) {
+                return entityMap[s];
+            });
+        }
 
 
-        var encontrar = find(db.users, "username", "juan");
-        console.log("valor encontrado");
-        console.log(encontrar);
-
-
+        ion.sound({
+            sounds: [{
+                    name: "iPhoneRingtone",
+                    loop: true
+                },
+                {
+                    name: "marimba",
+                    loop: true
+                },
+                {
+                    name: "ping"
+                },
+                {
+                    name: "repique",
+                    loop: true
+                }
+            ],
+            volume: 0.5,
+            path: "sounds/",
+            preload: true
+        })
 
 
         new PerfectScrollbar('#message-box');
         new PerfectScrollbar('#user-section');
         var toggle = false;
+        var timer;
+        var llamadaContestada;
 
         $(function () {
 
@@ -359,6 +393,15 @@
 
 
             var username = prompt("Introduce tu nombre de usuario", "");
+            var me;
+            $.each(db.users, function (key, value) {
+
+                if (value.username == username) {
+                    me = value;
+                }
+            });
+
+            console.log(me);
 
             // Cargar las conversaciones
             $.each(db.connections, function (key, value) {
@@ -396,7 +439,7 @@
             var connectedPeers = {};
 
             var peer = new Peer(username, {
-                host: "192.168.0.178",
+                host: "192.168.0.169",
                 port: 9000,
                 path: '/peerjs',
                 debug: 3,
@@ -483,30 +526,88 @@
 
             // Este evento se ejecuta al detectar la llamada de un usuario
             peer.on('call', function (call) {
-                console.log(call);
-                var acceptsCall = confirm("Videollamada entrante, desea responder?");
-                if (acceptsCall) {
-                    call.answer(window.localStream);
-                    // Recibir data
-                    call.on('stream', function (stream) {
-                        // Guardar un referencia global de la informacion transmitida
-                        window.peer_stream = stream;
-                        // Muestra la trasmision del usuario conectado en mi camara
-                        onReceiveStream(stream, 'peer-camera');
-                        $('#camera').removeClass('d-none');
-                        $('#info').addClass('d-none');
-                        $("#hangup").prop("disabled", false);
-                        $("#call").prop("disabled", true);
-                        
+                llamadaContestada = false;
+                ion.sound.play("marimba");
+
+                timer = setTimeout(function () {
+                    if (llamadaContestada == false) {
+                        ion.sound.stop("marimba");
+                        swal("Llamada perdida de " + call.metadata.me.nombre + " " + call.metadata
+                            .me.apellido);
+                    }
+
+                }, 30000);
+
+                swal(call.metadata.me.nombre + " " + call.metadata.me.apellido +
+                        " te esta llamando, ¿deseas responder?", {
+                            buttons: {
+                                cancelar: "Cancelar",
+                                contestar: "Contestar",
+                            },
+                        })
+                    .then((value) => {
+                        switch (value) {
+
+                            case "cancelar":
+                                call.close();
+                                swal("Has cancelado esta llamada");
+                                ion.sound.stop("marimba");
+                                llamadaContestada = true;
+                                break;
+
+                            case "contestar":
+                                ion.sound.stop("marimba");
+                                call.answer(window.localStream);
+                                // Recibir data
+                                call.on('stream', function (stream) {
+                                    llamadaContestada = true;
+                                    // Guardar un referencia global de la informacion transmitida
+                                    window.peer_stream = stream;
+                                    // Muestra la trasmision del usuario conectado en mi camara
+                                    onReceiveStream(stream, 'peer-camera');
+                                    $('#camera').removeClass('d-none');
+                                    $('#info').addClass('d-none');
+                                    $("#hangup").prop("disabled", false);
+                                    $("#call").prop("disabled", true);
+                                    $('#chatbox-section').removeClass('d-none');
+                                    $('#camera-section').removeClass('d-none');
+                                    $('.user').removeClass('active');
+                                    $('#' + call.peer).addClass('active');
+
+                                    $.each(db.users, function (key, value) {
+                                        if (value.username == call.peer) {
+                                            $('.text-header').html("<p>" + value.nombre +
+                                                " " + value.apellido +
+                                                "<br><small></small></p>");
+                                            $('#user-camera').html(value.nombre +
+                                                " " + value.apellido);
+                                            $('#info-name').html(value.nombre + " " +
+                                                value.apellido);
+                                            $('#info-username').html(value.username);
+                                            $('#info-image').prop("src", value.imagen);
+                                        }
+                                    });
+
+
+                                });
+                                // Se ejecuta cuando la llamada finaliza
+                                call.on('close', function () {
+                                    $('#camera').addClass('d-none');
+                                    $('#info').removeClass('d-none');
+                                });
+
+                                $("#hangup").click(function () {
+                                    call.close();
+                                    $("#hangup").prop("disabled", true);
+                                    $("#call").prop("disabled", false);
+                                    $('#camera').addClass('d-none');
+                                    $('#info').removeClass('d-none');
+                                });
+                                break;
+                        }
                     });
-                    // Se ejecuta cuando la llamada finaliza
-                    call.on('close', function () {
-                        $('#camera').addClass('d-none');
-                        $('#info').removeClass('d-none');
-                    });
-                } else {
-                    console.log("Call denied !");
-                }
+
+
             });
 
 
@@ -531,7 +632,7 @@
                                 db.conversations[key].messages.push(obj);
                             }
                         });
-
+                        ion.sound.play("ping");
                         $('#' + c.peer + " span#last_message").html(data);
 
                         if (typeof $('.active')["0"].id !== "undefined") {
@@ -559,6 +660,7 @@
                             var dataBlob = new Blob([dataView]);
 
                             var url = window.URL.createObjectURL(dataBlob);
+                            ion.sound.play("ping");
                             $('#' + c.peer + " span#last_message").html(c.peer +
                                 " te ha enviado un <a href='" + url + "'>archivo</a>");
 
@@ -606,7 +708,8 @@
                         serialization: 'none',
                         metadata: {
                             conversation_id: conversation_id,
-                            requestedPeer: requestedPeer
+                            requestedPeer: requestedPeer,
+                            peer: me
                         }
                     });
                     c.on('open', function () {
@@ -631,9 +734,6 @@
 
                 $('#chatbox-section').removeClass('d-none');
                 $('#camera-section').removeClass('d-none');
-
-
-
 
                 $.each(db.users, function (key, value) {
                     if (value.username == requestedPeer) {
@@ -683,7 +783,7 @@
 
                 e.preventDefault();
 
-                var msg = $('#message-text').val();
+                var msg = escapeHtml($('#message-text').val());
                 eachActiveConnection(function (c, $c) {
                     if (c.label === 'chat') {
                         console.log($c);
@@ -716,7 +816,7 @@
 
                     $(this).attr("disabled", "disabled");
 
-                    var msg = $('#message-text').val();
+                    var msg = escapeHtml($('#message-text').val());
                     eachActiveConnection(function (c, $c) {
                         if (c.label === 'chat') {
                             console.log($c);
@@ -748,16 +848,49 @@
             });
 
             $("#call").click(function () {
+                llamadaContestada = false;
                 $("#hangup").prop("disabled", false);
                 $("#call").prop("disabled", true);
                 eachActiveConnection(function (c, $c) {
-                    var call = peer.call(c.peer, window.localStream);
+                    var call = peer.call(c.peer, window.localStream, {
+                        metadata: {
+                            me: me
+                        }
+                    });
+                    ion.sound.play("repique");
+                    swal("Llamando a " + c.peer + "...");
+
+                    timer = setTimeout(function () {
+                        if (llamadaContestada == false) {
+                            $("#hangup").prop("disabled", true);
+                            $("#call").prop("disabled", false);
+                            $('#camera').addClass('d-none');
+                            $('#info').removeClass('d-none');
+                            ion.sound.stop("repique");
+                            swal(c.peer + " no ha contestado");
+                        }
+
+                    }, 30000);
+
+
                     call.on('stream', function (stream) {
+                        llamadaContestada = true;
+                        ion.sound.stop("repique");
                         window.peer_stream = stream;
                         onReceiveStream(stream, 'peer-camera');
                         $('#camera').removeClass('d-none');
                         $('#info').addClass('d-none');
+                        swal.close();
                     });
+
+                    // Se ejecuta cuando la llamada finaliza
+                    call.on('close', function () {
+                        $('#camera').addClass('d-none');
+                        $('#info').removeClass('d-none');
+                        $("#hangup").prop("disabled", true);
+                                    $("#call").prop("disabled", false);
+                    });
+
 
                     $("#hangup").click(function () {
                         call.close();
@@ -793,7 +926,7 @@
                     onReceiveStream(stream, 'my-camera');
                 },
                 error: function (err) {
-                    alert("Cannot get access to your camera and video !");
+                    alert("No se pudo acceder a tu camara");
                     console.error(err);
                 }
             });
