@@ -439,7 +439,7 @@
             var connectedPeers = {};
 
             var peer = new Peer(username, {
-                host: "192.168.0.169",
+                host: "192.168.1.36",
                 port: 9000,
                 path: '/peerjs',
                 debug: 3,
@@ -614,9 +614,17 @@
             // Este evento se ejecuta cuando se detecta una nueva conexion con un usuario
             peer.on('connection', connect);
 
+
+            function blobToFile(theBlob, fileName) {
+                //A Blob() is almost a File() - it's just missing the two properties below which we will add
+                theBlob.lastModifiedDate = new Date();
+                theBlob.name = fileName;
+                return theBlob;
+            }
+
+
             // Esta funcion se ejecuta cuando un usuario conecta con otro, y se dispara en el evento 'connection'
             function connect(c) {
-
 
 
                 if (c.label === 'chat') {
@@ -640,6 +648,9 @@
                                 $('#messages-section').append(
                                     "<div class='border border-secondary rounded'>" +
                                     data + "</div>");
+                                $('#message-box').animate({
+                                    scrollTop: document.querySelector("#message-box").scrollHeight
+                                }, 1000);
                             }
                         }
 
@@ -657,12 +668,34 @@
 
                         if (data.constructor === ArrayBuffer) {
                             var dataView = new Uint8Array(data);
+
+
+
                             var dataBlob = new Blob([dataView]);
+                            var arc = blobToFile(dataBlob, "archivo");
+
+                            console.log(arc);
 
                             var url = window.URL.createObjectURL(dataBlob);
                             ion.sound.play("ping");
                             $('#' + c.peer + " span#last_message").html(c.peer +
                                 " te ha enviado un <a href='" + url + "'>archivo</a>");
+
+
+                            var message_temp = "<a href='" + url + "'>Descargar</a>";
+                            $.each(db.conversations, function (key, value) {
+                                if (value.connections_id == c.metadata.conversation_id) {
+                                    var obj = {
+                                        from: username,
+                                        message: message_temp
+                                    };
+                                    db.conversations[key].messages.push(obj);
+                                }
+                            });
+
+                            $('#message-box').animate({
+                                scrollTop: document.querySelector("#message-box").scrollHeight
+                            }, 1000);
 
                         }
                     });
@@ -685,6 +718,11 @@
                         $('#messages-section').append(
                             "<div class='border border-secondary rounded me'>" + file.name +
                             " (" + file.size + " bytes)</div>");
+                        $('#message-box').animate({
+                            scrollTop: document.querySelector("#message-box").scrollHeight
+                        }, 1000);
+
+
                     }
                 });
             });
@@ -720,7 +758,12 @@
                     });
                     var f = peer.connect(requestedPeer, {
                         label: 'file',
-                        reliable: true
+                        reliable: true,
+                        metadata: {
+                            conversation_id: conversation_id,
+                            requestedPeer: requestedPeer,
+                            peer: me
+                        }
                     });
                     f.on('open', function () {
                         connect(f);
@@ -756,15 +799,21 @@
                                     "<div class='border border-secondary rounded me'>" +
                                     value1.message +
                                     "</div>");
+
                             } else {
                                 $('#messages-section').append(
                                     "<div class='border border-secondary rounded'>" +
                                     value1.message +
                                     "</div>");
+
                             }
                         });
                     }
                 });
+
+                $('#message-box').animate({
+                    scrollTop: document.querySelector("#message-box").scrollHeight
+                }, 1000);
 
 
 
@@ -784,39 +833,10 @@
                 e.preventDefault();
 
                 var msg = escapeHtml($('#message-text').val());
-                eachActiveConnection(function (c, $c) {
-                    if (c.label === 'chat') {
-                        console.log($c);
-                        c.send(msg);
 
+                console.log(msg);
 
-
-                        $.each(db.conversations, function (key, value) {
-                            if (value.connections_id == c.metadata.conversation_id) {
-                                var obj = {
-                                    from: username,
-                                    message: msg
-                                };
-                                db.conversations[key].messages.push(obj);
-                            }
-                        });
-
-
-                        $('#messages-section').append(
-                            "<div class='border border-secondary rounded me'>" + msg +
-                            "</div>");
-                    }
-                });
-                $('#message-text').val('');
-                $('#message-text').focus();
-            });
-
-            $('#message-text').on('keypress', function (e) {
-                if (e.which === 13) {
-
-                    $(this).attr("disabled", "disabled");
-
-                    var msg = escapeHtml($('#message-text').val());
+                if (msg.trim() != "") {
                     eachActiveConnection(function (c, $c) {
                         if (c.label === 'chat') {
                             console.log($c);
@@ -838,12 +858,65 @@
                             $('#messages-section').append(
                                 "<div class='border border-secondary rounded me'>" + msg +
                                 "</div>");
+
+                            $('#message-box').animate({
+                                scrollTop: document.querySelector("#message-box").scrollHeight
+                            }, 1000);
                         }
                     });
-                    $('#message-text').val('');
-                    $('#message-text').focus();
+                }
+
+                $('#message-text').val('');
+                $('#message-text').focus();
+            });
+
+            $('#message-text').on('keypress', function (e) {
+                if (e.which === 13) {
+
+                    $(this).attr("disabled", "disabled");
+
+                    var msg = escapeHtml($('#message-text').val());
+
+                    if (msg.trim() != "") {
+                        eachActiveConnection(function (c, $c) {
+                            if (c.label === 'chat') {
+                                console.log($c);
+                                c.send(msg);
+
+
+
+                                $.each(db.conversations, function (key, value) {
+                                    if (value.connections_id == c.metadata.conversation_id) {
+                                        var obj = {
+                                            from: username,
+                                            message: msg
+                                        };
+                                        db.conversations[key].messages.push(obj);
+                                    }
+                                });
+
+
+                                $('#messages-section').append(
+                                    "<div class='border border-secondary rounded me'>" +
+                                    msg +
+                                    "</div>");
+
+                                $('#message-box').animate({
+                                    scrollTop: document.querySelector("#message-box").scrollHeight
+                                }, 1000);
+
+                            }
+                        });
+                    }
 
                     $(this).removeAttr("disabled");
+
+
+                    $('#message-text').focus();
+                    $('#message-text').val('');
+
+
+
                 }
             });
 
@@ -888,7 +961,7 @@
                         $('#camera').addClass('d-none');
                         $('#info').removeClass('d-none');
                         $("#hangup").prop("disabled", true);
-                                    $("#call").prop("disabled", false);
+                        $("#call").prop("disabled", false);
                     });
 
 
