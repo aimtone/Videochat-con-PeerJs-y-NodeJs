@@ -1,0 +1,59 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "username": "anthony",
+      "nombre": "Anthony",
+      "apellido": "Medina",
+      "imagen":
+        "http://www.tuestima.com/wp-content/uploads/2015/11/Entrevista-Dr-Nicholas-Perricone.jpg"
+    },
+    {
+      "id": 2,
+      "username": "juan",
+      "nombre": "Juan",
+      "apellido": "Sanchez",
+      "imagen":
+        "https://labs.openviewpartners.com/wp-content/uploads/2016/02/Mike-King-300x300.png"
+    },
+    {
+      "id": 3,
+      "username": "pedro",
+      "nombre": "Pedro",
+      "apellido": "Perez",
+      "imagen":
+        "http://www.hemorroidestratamientoycura.com/wp-content/uploads/2012/10/doctor.png"
+    }
+  ],
+  "connections": [
+    {
+      "id": 1,
+      "peers": ["anthony", "juan"]
+    },
+    {
+      "id": 2,
+      "peers": ["anthony", "pedro"]
+    },
+    {
+      "id": 3,
+      "peers": ["pedro", "juan"]
+    }
+  ],
+  "conversations": [
+    {
+      "id": 1,
+      "connections_id": 1,
+      "messages": []
+    },
+    {
+      "id": 2,
+      "connections_id": 2,
+      "messages": []
+    },
+    {
+      "id": 3,
+      "connections_id": 3,
+      "messages": []
+    }
+  ]
+}
