@@ -180,3 +180,14 @@ function onReceiveStream(stream, element_id) {
     window.peer_stream = stream;
 }
 </code></pre>
+
+`escapeHtml` : Se encarga de escapar los caracteres de etiquetas HTML con el fin de que cuando un usuario envie un mensaje cuyo contenido sea HTML, se envie tal cual y como lo ha escrito, evitando asi que el navegador pueda interpretar el contenido como HTML
+### Definicion
+<pre><code>
+var entityMap = {"&": "&amp;","<": "&lt;",">": "&gt;",'"': "&quot;","'": "&#39;","/": "&#x2F;","`": "&#x60;","=": "&#x3D;"};
+function escapeHtml(string) {
+    return String(string).replace(/[&<>"'`=\/]/g, function(s) {
+        return entityMap[s];
+    });
+}
+</code></pre>
