@@ -22,7 +22,7 @@ Tenga en cuenta que para que la aplicacin se ejecute de forma correcta, desde el
 
 Para realizar esto, en un editor de texto, abrimos el archivo ubicado en `public/index.html` y ubicar el siguiente codigo
 
-<pre><code>
+```javascript
 var peer = new Peer(username, {
     host: "localhost",
     port: 9000,
@@ -41,7 +41,7 @@ var peer = new Peer(username, {
         ]
     }
 });
-</code></pre>
+```
 
 En el atributo `host`, sustituir por la direccion de IP actual del computador
 
@@ -51,14 +51,14 @@ Luego de hacer esto, el videochat funcionara a la perfeccion
 
 ## Eventos
 
-<pre><code>
+```javascript
 // Sintaxis
 @params {
     evento : typeof string
     funcion: typeof function
 }
 peer.on(evento, funcion);
-</code></pre>
+```
 
 ### Listado de eventos
 
@@ -76,7 +76,7 @@ A continuacion, se presenta una tabla con los eventos de PeerJs usados en este v
 `peer.connect(id, opciones)`
 
 Ejemplo
-<pre><code>
+```javascript
 @ Params {
     id : string
     opciones: object
@@ -88,12 +88,12 @@ peer.connect("id-peer", {
         // informacion personalizada para enviar al otro usuario
     }
 });
-</code></pre>
+```
 
 `peer.call(id, stream ,opciones)`
 
 Ejemplo
-<pre><code>
+```javascript
 @ Params {
     id : string
     stream : blob,
@@ -104,7 +104,7 @@ peer.call("id-peer", stream, {
         // informacion personalizada para enviar al otro usuario
     }
 });
-</code></pre>
+```
 
 ### Listado de eventos del parametro `conn`
 
@@ -129,19 +129,19 @@ El parametro `call` pertenece a una funcion anonima que es llamada desde el even
 `call.answer(stream)`
 
 Ejemplo
-<pre><code>
+```javascript
 @ Params {
     stream : blob
 }
 call.answer(stream);
-</code></pre>
+```
 
 # Funciones utiles de esta aplicacion
 
 `eachActiveConnection(conn)`: analiza todos los `divs` con la clase `.active`, toda aquel que tenga la clase y este conectado con el usuario, recibira la informacion que este envie, esta funcion se encarga de enviar a cada una de estas conexiones activas actualmente
 
 ### Definicion
-<pre><code>
+```javascript
 function eachActiveConnection(fn) {
     var actives = $('.active');
     var checkedIds = {};
@@ -157,11 +157,11 @@ function eachActiveConnection(fn) {
         checkedIds[peerId] = 1;
     });
 }
-</code></pre>
+```
 
 `requestLocalVideo` : Se encarga de solicitarte la conexion con tu camara web 
 ### Definicion
-<pre><code>
+```javascript
 function requestLocalVideo(callbacks) {
     navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
     navigator.getUserMedia({
@@ -169,25 +169,25 @@ function requestLocalVideo(callbacks) {
         video: true
     }, callbacks.success, callbacks.error);
 }
-</code></pre>
+```
 
 `onReceiveStream` : Se encarga de ubicar el stream recibido en la etiqueta `<video>` correspondiente 
 ### Definicion
-<pre><code>
+```javascript
 function onReceiveStream(stream, element_id) {
     var video = document.getElementById(element_id);
     video.src = window.URL.createObjectURL(stream);
     window.peer_stream = stream;
 }
-</code></pre>
+```
 
 `escapeHtml` : Se encarga de escapar los caracteres de etiquetas HTML con el fin de que cuando un usuario envie un mensaje cuyo contenido sea HTML, se envie tal cual y como lo ha escrito, evitando asi que el navegador pueda interpretar el contenido como HTML
 ### Definicion
-<pre><code>
+```javascript
 var entityMap = {"&": "&amp;","<": "&lt;",">": "&gt;",'"': "&quot;","'": "&#39;","/": "&#x2F;","`": "&#x60;","=": "&#x3D;"};
 function escapeHtml(string) {
     return String(string).replace(/[&<>"'`=\/]/g, function(s) {
         return entityMap[s];
     });
 }
-</code></pre>
+```

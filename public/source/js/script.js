@@ -297,9 +297,8 @@ $(function() {
             var dataView = new Uint8Array(data);
 
             var dataBlob = new Blob([dataView]);
-            var arc = blobToFile(dataBlob, "archivo");
-
-            console.log(arc);
+            saveAs(dataBlob, "hello world.txt");
+    
 
             var url = window.URL.createObjectURL(dataBlob);
             ion.sound.play("ping");
@@ -308,6 +307,7 @@ $(function() {
             );
 
             var message_temp = "<a href='" + url + "'>Descargar</a>";
+
             $.each(db.conversations, function(key, value) {
               if (value.connections_id == c.metadata.conversation_id) {
                 var obj = {
@@ -330,7 +330,7 @@ $(function() {
       connectedPeers[c.peer] = 1;
     }
 
-    
+
     
     box.on("dragenter", doNothing);
     box.on("dragover", doNothing);
